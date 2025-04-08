@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adrish - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        cursor: none; /* Keep hiding the default cursor */
+        background-color: #f8fafc;
+        color: #1f2937;
+        overflow-x: hidden;
+      }
+      a, button, .cursor-pointer, h1[onclick] {
+        cursor: none !important;
+      }
+
+      /* --- Subtle Circle Cursor Style --- */
+      #magic-cursor {
+        position: absolute;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background-color:rgba(31, 41, 55, 0);
+	mix-blend-mode: difference;
+	pointer-events: none;
+	transform: translate(-50%, -50%);
+	transition: width 0.3s, height 0.3s, background-color 0.3s;
+	animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+	0% {
+		box-shadow: 0 0 10px 5px rgba(31, 41, 55, 0);
+	}
+	100% {
+		box-shadow: 0 0 20px 10px rgba(31, 41, 55, 0);
+	}
+}
+
+
+      /* --- Canvas for Blob Particles --- */
+      #blobCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9998;
+      }
+
+      /* --- Navigation Link Styling --- */
+      .nav-link {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.85rem 1.7rem;
+        margin: 0.6rem;
+        background-color: #FFF1F2;
+        color: #E11D48;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      .nav-link:hover {
+        background-color: #FFE4E6;
+        color: #BE123C;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(190, 18, 60, 0.1);
+      }
+      .nav-link i {
+         margin-right: 0.6em;
+         width: 1.2em;
+         text-align: center;
+      }
+      header nav a:hover {
+        color: #E11D48;
+      }
+
+      /* --- Page Section Transition Styling --- */
+      .page-section {
+        transition: opacity 0.5s ease-in-out;
+        width: 100%;
+        text-align: center;
+      }
+      .hidden-section {
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        position: absolute;
+        pointer-events: none;
+      }
+    </style>
+</head>
+<body class="bg-stone-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- The custom circle cursor element (empty div) -->
+    <div id="magic-cursor"></div>
+
+    <!-- The canvas for drawing falling blobs -->
+    <canvas id="blobCanvas"></canvas>
+
+    <main class="flex-grow container mx-auto px-4 py-12 md:py-20 flex flex-col items-center justify-center">
+
+        <div id="home-section" class="page-section">
+            <header class="w-full mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-0 cursor-pointer" onclick="showSection('home-section')">
+                     ~ / adrish
+                </h1>
+                <nav class="hidden md:block">
+                    <a href="#" onclick="showSection('blog-section'); return false;" class="text-gray-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Blog</a>
+                    <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="text-gray-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Projects</a>
+                    <a href="#" onclick="alert('About page not implemented yet!'); return false;" class="text-gray-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
+                </nav>
+            </header>
+
+            <div class="mb-10 md:mb-16">
+                <a href="#" onclick="showSection('blog-section'); return false;" class="nav-link">
+                    <i class="fa-solid fa-file-lines"></i>Blog
+                </a>
+                <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>Projects
+                </a>
+                <a href="#" onclick="alert('About page not implemented yet!'); return false;" class="nav-link">
+                    <i class="fa-solid fa-user"></i>About
+                </a>
+            </div>
+
+            <div class="mb-10 md:mb-16">
+                 <a href="https://twitter.com/your_handle" target="_blank" rel="noopener noreferrer" class="nav-link" title="Twitter Profile">
+                    <i class="fa-brands fa-twitter"></i>Twitter
+                </a>
+                 <a href="#" onclick="alert('Games link not set up yet!'); return false;" class="nav-link" title="Games Section">
+                    <i class="fa-solid fa-gamepad"></i>Games
+                </a>
+                 <a href="https://github.com/your_username" target="_blank" rel="noopener noreferrer" class="nav-link" title="GitHub Profile">
+                    <i class="fa-brands fa-github"></i>Github
+                </a>
+            </div>
+
+            <div>
+                 <a href="https://linkedin.com/in/your_profile" target="_blank" rel="noopener noreferrer" class="nav-link" title="LinkedIn Profile">
+                    <i class="fa-brands fa-linkedin"></i>LinkedIn
+                </a>
+                 <a href="https://www.youtube.com/channel/YOUR_CHANNEL_ID" target="_blank" rel="noopener noreferrer" class="nav-link" title="YouTube Channel">
+                    <i class="fa-brands fa-youtube"></i>Youtube
+                </a>
+                 <a href="mailto:your.email@example.com" class="nav-link" title="Send Email">
+                    <i class="fa-solid fa-envelope"></i>Email
+                </a>
+            </div>
+        </div>
+
+        <div id="blog-section" class="page-section hidden-section">
+             <header class="w-full mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-0 cursor-pointer" onclick="showSection('home-section')">
+                     ~ / adrish
+                </h1>
+                <nav class="hidden md:block">
+                    <a href="#" onclick="showSection('blog-section'); return false;" class="text-rose-600 font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200">Blog</a>
+                    <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="text-gray-600 hover:text-rose-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Projects</a>
+                    <a href="#" onclick="alert('About page not implemented yet!'); return false;" class="text-gray-600 hover:text-rose-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
+                </nav>
+            </header>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Blog</h2>
+            <p class="text-gray-600">This is where the blog posts will appear. Content coming soon!</p>
+            <button onclick="showSection('home-section')" class="mt-10 px-6 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition duration-200 ease-in-out transform hover:-translate-y-0.5 shadow-md hover:shadow-lg">
+                Back to Home
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-6 text-gray-500 text-sm">
+        Copyright © <span id="copyright-year"></span> by Adrish.
+    </footer>
+
+    <script>
+        // --- Get References ---
+        const magicCursor = document.getElementById('magic-cursor');
+        const canvas = document.getElementById('blobCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- Global State ---
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        let blobs = [];
+        const coords = { x: -100, y: -100 };
+        let lastMouseX = -100;
+        let lastMouseY = -100;
+        let mouseVelocityX = 0;
+        let mouseVelocityY = 0;
+        let lastTime = 0;
+
+        // --- Subtle Blob Particle Class ---
+        class Blob {
+            constructor(x, y, velocityX, velocityY) {
+                this.x = x;
+                this.y = y;
+                // Subtle color: softer blue/grey
+                this.hue = 200 + Math.random() * 20; // Narrower hue range near blue
+                this.saturation = 30 + Math.random() * 20; // Lower saturation (30-50%)
+                this.lightness = 70 + Math.random() * 10; // Higher lightness (70-80%)
+                this.finalSize = 1.5 + Math.random() * 2; // Smaller size (1.5px to 3.5px)
+                this.size = this.finalSize * 2; // Start slightly larger
+                this.initialAlpha = 0.3 + Math.random() * 0.2; // Lower initial opacity (0.3-0.5)
+                this.alpha = this.initialAlpha;
+                // Reduced velocity influence and base speed
+                this.velocityX = velocityX * 0.03 + (Math.random() - 0.5) * 0.3;
+                this.velocityY = 0.5 + Math.random() * 0.3 + velocityY * 0.03; // Slower downward start
+                this.gravity = 0.015; // Less gravity
+                this.drag = 0.97; // Slight increase in drag
+                this.turbulence = () => Math.random() * 0.2 - 0.1; // Less turbulence
+                this.life = 0;
+                this.maxLife = 600 + Math.random() * 400; // Shorter life (0.6-1.0 seconds)
+            }
+
+            draw() {
+                ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update(deltaTime) {
+                this.life += deltaTime;
+                const lifeRatio = Math.min(1, this.life / this.maxLife); // 0 to 1
+
+                // Apply physics
+                this.x += this.velocityX + this.turbulence();
+                this.velocityX *= this.drag;
+                this.y += this.velocityY;
+                this.velocityY += this.gravity;
+
+                // Simple shrink over life
+                this.size = this.finalSize + (this.finalSize * (1 - lifeRatio));
+
+                // Fade out over the entire life duration
+                this.alpha = this.initialAlpha * (1 - lifeRatio);
+                this.alpha = Math.max(0, this.alpha); // Clamp alpha >= 0
+            }
+        }
+
+        // --- Event Listeners ---
+        window.addEventListener('mousemove', (e) => {
+            // Update cursor coordinates *immediately* for responsiveness
+            coords.x = e.clientX;
+            coords.y = e.clientY;
+
+            // Calculate velocity for blob physics
+            mouseVelocityX = e.clientX - lastMouseX;
+            mouseVelocityY = e.clientY - lastMouseY;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+
+            // Create fewer blobs, more subtly
+            const velocityMagnitude = Math.sqrt(mouseVelocityX**2 + mouseVelocityY**2);
+            // Create 1 blob if moving reasonably fast, max 2 for very fast moves
+            const blobsToCreate = Math.min(2, Math.ceil(velocityMagnitude / 15));
+
+            for (let i = 0; i < blobsToCreate; i++) {
+                const spawnX = e.clientX + (Math.random() - 0.5) * 5; // Closer spawn offset
+                const spawnY = e.clientY + (Math.random() - 0.5) * 5;
+                 blobs.push(new Blob(spawnX, spawnY, mouseVelocityX, mouseVelocityY));
+            }
+
+            // Very low chance of creating a blob when moving slowly
+             if (velocityMagnitude < 2 && Math.random() < 0.05) {
+                 blobs.push(new Blob(e.clientX, e.clientY, 0, 0)); // Create with no initial velocity boost
+             }
+        });
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        // --- Animation Loops ---
+
+        // Animation loop for the custom cursor
+        function animateCursor() {
+            // Use the coordinates directly - translate centers the circle
+            magicCursor.style.transform = `translate(${coords.x}px, ${coords.y}px) translate(-50%, -50%)`;
+            requestAnimationFrame(animateCursor);
+        }
+
+        // Animation loop for the canvas blobs
+        function updateBlobs(time = 0) {
+            const deltaTime = time - lastTime;
+            lastTime = time;
+
+            ctx.clearRect(0, 0, width, height);
+
+            blobs.forEach(blob => blob.update(deltaTime));
+            blobs.forEach(blob => blob.draw());
+
+            // Remove dead or off-screen blobs
+            blobs = blobs.filter(blob => blob.alpha > 0 && blob.life < blob.maxLife && blob.y < height + blob.size);
+
+            requestAnimationFrame(updateBlobs);
+        }
+
+        // --- Page Section Navigation Logic (Unchanged) ---
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+        function showSection(sectionIdToShow) {
+            // ... (showSection logic remains the same) ...
+             const sections = document.querySelectorAll('.page-section');
+            sections.forEach(section => {
+                if (section.id !== sectionIdToShow) {
+                    section.style.opacity = 0;
+                    setTimeout(() => {
+                        section.classList.add('hidden-section');
+                    }, 500);
+                }
+            });
+
+            const sectionToShow = document.getElementById(sectionIdToShow);
+            if (sectionToShow) {
+                sectionToShow.classList.remove('hidden-section');
+                setTimeout(() => {
+                    sectionToShow.style.opacity = 1;
+                }, 10);
+            }
+
+            const allNavLinks = document.querySelectorAll('header nav a');
+            allNavLinks.forEach(link => {
+                link.classList.remove('text-rose-600', 'font-semibold');
+                link.classList.add('text-gray-600', 'font-medium', 'hover:text-rose-600');
+            });
+
+            let activeLinkSelector = '';
+            if (sectionIdToShow === 'blog-section') {
+                activeLinkSelector = 'header nav a[onclick*="showSection(\'blog-section\'"]';
+            } else if (sectionIdToShow === 'projects-section') {
+                 activeLinkSelector = 'header nav a[onclick*="alert(\'Projects page"]';
+            } else if (sectionIdToShow === 'about-section') {
+                 activeLinkSelector = 'header nav a[onclick*="alert(\'About page"]';
+            }
+
+            if (activeLinkSelector) {
+                document.querySelectorAll(activeLinkSelector).forEach(activeLink => {
+                    if (activeLink) {
+                        activeLink.classList.remove('text-gray-600', 'font-medium', 'hover:text-rose-600');
+                        activeLink.classList.add('text-rose-600', 'font-semibold');
+                    }
+                 });
+             }
+        }
+
+        // --- Initialization ---
+        window.onload = () => {
+            showSection('home-section');
+            animateCursor(); // Start the cursor animation loop
+            updateBlobs();   // Start the blob particle loop
+        };
+
+    </script>
+
+</body>
+</html>

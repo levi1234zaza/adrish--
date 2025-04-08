@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<!-- Add dark-mode class here dynamically via JS -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adrish - Portfolio & Blog</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Markdown Parser (Marked.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Syntax Highlighting (Prism.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+
+    <!-- Chart.js (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind CSS v4 Browser CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+      /* ================================== */
+      /* === BASE & GENERAL STYLES ======== */
+      /* ================================== */
+      :root {
+        /* Define transition defaults for fluidity */
+        --transition-speed: 0.4s;
+        --transition-timing: cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc; /* Light: bg-slate-50 */
+        color: #1f2937; /* Light: text-gray-800 */
+        overflow-x: hidden;
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        /* Desktop cursor set specifically below */
+      }
+
+      /* Define cursor behavior based on non-touch media query */
+      @media (hover: hover) and (pointer: fine) {
+        body { cursor: none; }
+        a, button, .cursor-pointer, h1[onclick] { cursor: none !important; }
+        #blog-list > div.group { cursor: none; }
+      }
+       @media (hover: none) or (pointer: coarse) {
+         body { cursor: default; }
+         a, button, .cursor-pointer, h1[onclick] { cursor: pointer !important; }
+          #blog-list > div.group { cursor: pointer !important; }
+      }
+
+      main.container {
+          transition: padding var(--transition-speed) var(--transition-timing);
+      }
+
+      /* --- Section Transitions --- */
+      .page-section {
+        transition: opacity 0.5s ease-in-out;
+        width: 100%;
+      }
+      .hidden-section {
+        opacity: 0; height: 0; overflow: hidden; position: absolute;
+        pointer-events: none; display: none;
+      }
+      .page-section:not(.hidden-section) {
+        display: block; position: relative; height: auto; overflow: visible;
+      }
+
+      /* --- Site Title --- */
+      .site-title {
+        display: inline-block; position: relative;
+        /* Light Mode Vars */
+        --site-title-color-light: #1f2937;
+        --gradient-light: linear-gradient(to right, #ff7300, #232020, #3f1c1c, #6f2727);
+        /* Dark Mode Vars */
+        --site-title-color-dark: #f9fafb;
+        --gradient-dark: linear-gradient(to right, #fb7185, #a855f7, #2dd4bf, #60a5fa);
+        /* Base (Light Mode) */
+        color: var(--site-title-color-light); background: none;
+        -webkit-background-clip: initial; background-clip: initial;
+        -webkit-text-fill-color: initial; -moz-text-fill-color: initial;
+        /* Apply fluid font size & transition */
+        font-size: clamp(1.75rem, 5vw + 0.5rem, 2.25rem); /* min, preferred (dynamic), max */
+        font-weight: 700; /* Use Tailwind 'font-bold' equivalent */
+        transition: color var(--transition-speed) ease,
+                    font-size var(--transition-speed) var(--transition-timing);
+      }
+       @media (min-width: 768px) { /* Desktop Title Size */
+          .site-title {
+              font-size: 2.25rem; /* text-4xl */
+           }
+       }
+      .site-title::before {
+        content: '~ / adrish'; /* Replica */
+        position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+        white-space: nowrap; z-index: 1;
+        background: var(--gradient-colors);
+        background-size: cover; background-position: left center; background-repeat: no-repeat;
+        -webkit-background-clip: text; background-clip: text;
+        color: transparent; -webkit-text-fill-color: transparent; -moz-text-fill-color: transparent;
+        width: 0; overflow: hidden;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .site-title::before { --gradient-colors: var(--gradient-light); }
+      .site-title:hover::before { width: 100%; }
+
+
+      /* ================================== */
+      /* === DESKTOP SPECIFIC EFFECTS ==== */
+      /* ================================== */
+      /* These will be disabled below 768px */
+      #magic-cursor {
+        position: fixed; width: 20px; height: 20px; border-radius: 50%;
+        background-color:rgba(31, 41, 55, 0.2); mix-blend-mode: difference;
+        pointer-events: none; transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+        z-index: 9999; top: 0; left: 0;
+      }
+      #blobCanvas {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: -1;
+      }
+
+      /* ================================== */
+      /* === HEADER & NAVIGATION ========== */
+      /* ================================== */
+      header {
+         /* Uses flex classes for desktop alignment */
+         /* Transitions added for fluid mobile changes */
+         transition: margin-bottom var(--transition-speed) var(--transition-timing),
+                     gap var(--transition-speed) var(--transition-timing);
+      }
+      header .site-title { /* Already has transitions */ }
+      header .theme-toggle-button {
+          transition: transform var(--transition-speed) var(--transition-timing);
+      }
+      header nav {
+          /* Desktop nav styling (using Tailwind classes primarily) */
+          transition: opacity 0.3s ease;
+      }
+       header nav a.nav-top-link {
+            /* Base styles from Tailwind */
+           transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+       }
+      header nav a.nav-top-link:hover { /* Handled by Tailwind hover: */ }
+
+
+      /* ================================== */
+      /* === HOME SECTION COMPONENTS ====== */
+      /* ================================== */
+      /* Main flex container for Photo & Buttons */
+      #home-section > .flex {
+           transition: gap var(--transition-speed) var(--transition-timing),
+                       flex-direction var(--transition-speed) var(--transition-timing); /* Animate direction change? maybe not needed */
+           /* Desktop layout primarily uses Tailwind md:flex-row */
+       }
+
+       /* --- Profile Photo --- */
+      .profile-photo-column {
+           flex-shrink: 0;
+           /* Desktop translate set via Tailwind: md:translate-x-[-2cm] md:translate-y-[0.5cm] */
+           transition: transform var(--transition-speed) var(--transition-timing),
+                       width var(--transition-speed) var(--transition-timing),
+                       margin var(--transition-speed) var(--transition-timing);
+           position: relative; /* Needed for potential z-index adjustments */
+           z-index: 10; /* Keep photo above grid during transition */
+       }
+      .profile-photo-column .profile-img-inline {
+         display: block;
+         /* Size controlled by Tailwind w-XX h-XX classes */
+         border-radius: 50%; object-fit: cover;
+         margin-left: auto; margin-right: auto;
+         border: 4px solid #E11D48; /* Light */
+         box-shadow: 0 6px 12px rgba(31, 41, 55, 0.15), 0 2px 4px rgba(31, 41, 55, 0.1);
+         /* Smooth transition for size, border, shadow, transform */
+         transition: transform var(--transition-speed) var(--transition-timing),
+                     width var(--transition-speed) var(--transition-timing),
+                     height var(--transition-speed) var(--transition-timing),
+                     border-color var(--transition-speed) ease,
+                     box-shadow var(--transition-speed) ease;
+         transform-origin: center center;
+         transform: scale(1);
+       }
+        /* Desktop Hover (specific to avoid mobile triggering) */
+       @media (min-width: 768px) {
+         .profile-photo-column .profile-img-inline:hover {
+             transform: scale(1.75);
+             box-shadow: 0 10px 20px rgba(31, 41, 55, 0.2), 0 3px 6px rgba(31, 41, 55, 0.15);
+             z-index: 9991; /* Ensure shadow isn't cut */
+         }
+          .dark-mode .profile-photo-column .profile-img-inline:hover {
+               box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
+               /* border-color: #fb7185; Optional */
+          }
+      }
+
+      /* --- Button Grid & Links --- */
+      .button-links-grid {
+          display: grid; /* Base */
+          /* Columns defined by Tailwind: grid-cols-3 */
+          /* Justify defined by Tailwind: justify-items-center md:justify-items-start */
+          width: auto; /* Desktop default */
+          max-width: none; /* Desktop default */
+           transition: gap var(--transition-speed) var(--transition-timing),
+                       grid-template-columns var(--transition-speed) var(--transition-timing), /* May not animate smoothly */
+                       max-width var(--transition-speed) var(--transition-timing),
+                       padding var(--transition-speed) var(--transition-timing);
+       }
+            .nav-link {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 0.85rem 1.7rem; margin: 0rem; /* Reset margin, use grid gap */
+        background-color: #FFF1F2; color: #E11D48;
+        border-radius: 0.75rem;
+        /* --- START: Added Font Styles --- */
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 700; /* Was 500 */
+        /* font-style: italic; */
+        /* --- END: Added Font Styles --- */
+        text-decoration: none;
+        line-height: 1; text-align: center;
+        font-size: 1rem; /* Base font size */
+        box-shadow: 0 1px 2px rgba(190, 18, 60, 0.05); /* Subtle base shadow */
+        /* Apply smooth transitions to individual links too */
+         transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out,
+                     transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+                     padding var(--transition-speed) var(--transition-timing),
+                     font-size var(--transition-speed) var(--transition-timing);
+    }
+       /* Desktop Hover Only */
+      @media (min-width: 768px) {
+        .nav-link:hover {
+            background-color: #FFE4E6; color: #BE123C;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(190, 18, 60, 0.1);
+        }
+         .dark-mode .nav-link:hover {
+             background-color: #374151; /* gray-700 */
+             color: #fb7185; /* rose-400 */
+             box-shadow: 0 4px 10px rgba(253, 164, 175, 0.1);
+             transform: translateY(-2px); /* Keep transform consistency */
+         }
+      }
+    .nav-link i {
+        margin-right: 0.6em; width: 1.2em; text-align: center; flex-shrink: 0;
+        transition: margin-right var(--transition-speed) var(--transition-timing);
+    }
+
+
+      /* ================================== */
+      /* === BLOG CONTENT STYLES ========== */
+      /* ================================== */
+      /* Compacted common blog styles */
+      .blog-content { text-align: left; max-width: 800px; margin: 0 auto; color: #374151; font-family: 'IBM Plex Mono', monospace; transition: padding var(--transition-speed) var(--transition-timing), max-width var(--transition-speed) var(--transition-timing); }
+      .blog-content h1, .blog-content h2, .blog-content h3, .blog-content h4 { font-family: "EB Garamond", serif; transition: font-size var(--transition-speed) var(--transition-timing), margin var(--transition-speed) var(--transition-timing), padding var(--transition-speed) var(--transition-timing); color: #1f2937; }
+      .blog-content h1 { font-size: clamp(1.75rem, 5vw + 0.5rem, 2.25rem); line-height: 1.2; font-weight: 700; margin: 1.5rem 0 1.5rem; padding: 1rem 0 0.75rem; border-bottom: 1px solid #d1d5db; }
+      .blog-content h2 { font-size: clamp(1.375rem, 4vw + 0.4rem, 1.875rem); line-height: 1.3; font-weight: 600; margin: 2.5rem 0 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
+      .blog-content h3 { font-size: clamp(1.15rem, 3vw + 0.4rem, 1.5rem); line-height: 1.4; font-weight: 600; margin: 2rem 0 1rem; }
+      .blog-content h4 { font-size: clamp(1rem, 2.5vw + 0.4rem, 1.125rem); line-height: 1.5; font-weight: 600; margin: 0.75rem 0; color: #374151; } /* Slightly different color */
+      .blog-content p { margin: 1rem 0; line-height: 1.625; }
+      .blog-content ul, .blog-content ol { margin: 1rem 0; padding-left: 1.5rem; list-style-position: outside; } /* Adjusted padding/position */
+      .blog-content ul { list-style-type: disc; } .blog-content ol { list-style-type: decimal; }
+      .blog-content li { margin-bottom: 0.35rem; }
+      .blog-content blockquote { margin: 1.25rem 0; padding: 0.75rem 1rem; border-left: 4px solid #fb7185; font-style: italic; color: #4b5563; background-color: #fff1f2; border-radius: 0.25rem; }
+      .blog-content code:not([class*="language-"]) { background-color: #e5e7eb; color: #1f2937; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.9em; font-family: 'IBM Plex Mono', monospace; vertical-align: middle; word-break: break-word; }
+      .blog-content pre[class*="language-"] { border-radius: 0.5rem; margin: 1.5rem 0 !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); overflow-x: auto; } /* Added overflow */
+      .blog-content pre code[class*="language-"] { font-size: 0.875rem; line-height: 1.625; display: block; padding: 1rem !important; font-family: "Courier New", Courier, monospace !important; white-space: pre; }
+      .blog-content a { color: #e11d48; text-decoration-color: #fda4af; transition: color 0.2s ease, text-decoration-color 0.2s ease; text-decoration: underline; text-underline-offset: 2px; }
+      .blog-content a:hover { color: #9f1239; text-decoration-color: #f43f5e; }
+      .blog-content img { max-width: 100%; height: auto; margin: 1.5rem auto; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); display: block; border: 1px solid #e5e7eb; }
+      .blog-content figcaption { font-size: 0.875rem; text-align: center; color: #6b7280; font-style: italic; display: block; margin: 0.5rem auto 1.25rem; }
+      .blog-content hr { margin: 2rem 0; border: 0; border-top: 1px solid #d1d5db; }
+      .blog-content mark { background-color: #fef08a; padding: 0 0.25rem; border-radius: 0.25rem; }
+      .blog-content table { width: 100%; margin: 1.25rem 0; border-collapse: collapse; border: 1px solid #d1d5db; }
+      .blog-content th, .blog-content td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+      .blog-content th { background-color: #f3f4f6; font-weight: 600; /* Medium -> Semibold */ }
+      .blog-content iframe { max-width: 100%; border: 1px solid #d1d5db; border-radius: 0.25rem; margin: 1rem 0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+      .aspect-video { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1.5rem 0; border-radius: 0.375rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+      .aspect-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+      /* Desktop blog heading sizes (overriding clamp if needed) */
+      @media (min-width: 768px) {
+          .blog-content h1 { font-size: 2.25rem; /* 36px */ }
+          .blog-content h2 { font-size: 1.875rem; /* 30px */ }
+          .blog-content h3 { font-size: 1.5rem; /* 24px */ }
+          .blog-content h4 { font-size: 1.125rem; /* 18px */ }
+      }
+
+      /* ================================== */
+      /* === BLOG LIST STYLES ============= */
+      /* ================================== */
+      #blog-list h2 { text-align: left; font-size: clamp(1.5rem, 4vw + 0.5rem, 1.875rem); margin-bottom: 1.5rem; font-weight: 600; transition: font-size var(--transition-speed) var(--transition-timing); }
+       @media (min-width: 768px) { #blog-list h2 { font-size: 1.875rem; /* 30px */ } }
+      #blog-list > div.group { margin-bottom: 1.5rem; padding: 0.5rem; border-bottom: 1px solid #e5e7eb; border-radius: 0.35rem; transition: background-color 0.2s ease, transform 0.2s ease, border-color var(--transition-speed) ease; /* Base cursor set by media query */ }
+      #blog-list > div.group:hover { background-color: #f9fafb; transform: translateY(-1px); }
+      #blog-list > div.group:last-child { border-bottom-width: 0; padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+      #blog-list > div.group h3 { font-size: clamp(1.125rem, 3vw + 0.3rem, 1.25rem); font-weight: 600; color: #1f2937; transition: color 0.2s ease, font-size var(--transition-speed) var(--transition-timing); margin-bottom: 0.25rem; pointer-events: none; }
+       @media (min-width: 768px) { #blog-list > div.group h3 { font-size: 1.25rem; } }
+      #blog-list > div.group:hover h3 { color: #be123c; }
+      #blog-list > div.group p { pointer-events: none; transition: color 0.2s ease; }
+      #blog-list > div.group p:nth-of-type(1) { margin-bottom: 0.5rem; font-size: 0.875rem; color: #6b7280; }
+      #blog-list > div.group p:nth-of-type(2) { font-size: clamp(0.9rem, 2vw + 0.4rem, 1rem); line-height: 1.5; color: #4b5563; }
+      .back-to-list-button { display: inline-flex; align-items: center; margin-bottom: 2rem; color: #e11d48; font-weight: 500; transition: color 0.2s ease; text-decoration: none; /* cursor already pointer */ }
+      .back-to-list-button:hover { color: #9f1239; }
+      .back-to-list-button i { margin-right: 0.5rem; }
+
+      /* =============================== */
+      /* === DARK MODE OVERRIDES ======= */
+      /* =============================== */
+      .dark-mode { background-color: #111827; color: #d1d5db; }
+      .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode .text-gray-900 { color: #f9fafb; }
+      .dark-mode .text-gray-800 { color: #f3f4f6; } .dark-mode .text-gray-700 { color: #d1d5db; }
+      .dark-mode .text-gray-600 { color: #9ca3af; } .dark-mode .text-gray-500 { color: #6b7280; }
+      .dark-mode hr { border-color: #374151; }
+      .dark-mode #magic-cursor { background-color: rgba(220, 220, 240, 0.2); }
+      /* Dark Mode Header/Nav */
+      .dark-mode header nav a.nav-top-link { color: #9ca3af; }
+      .dark-mode header nav a.nav-top-link:hover { color: #fca5a5; }
+      .dark-mode header nav a.nav-top-link.font-semibold { color: #fda4af !important; }
+      .dark-mode .site-title { color: var(--site-title-color-dark); }
+      .dark-mode .site-title::before { --gradient-colors: var(--gradient-dark); width: 0; }
+      .dark-mode .site-title:hover::before { width: 100%; }
+      /* Dark Mode Home Section Links */
+      .dark-mode .nav-link { background-color: #1f2937; color: #fda4af; }
+       /* Mobile hover/active state in dark mode needs separate check if different from desktop */
+      @media (hover: hover) and (pointer: fine) and (min-width: 768px) { /* Dark desktop hover only */
+          .dark-mode .nav-link:hover {
+              background-color: #374151; color: #fb7185;
+              box-shadow: 0 4px 10px rgba(253, 164, 175, 0.1);
+              transform: translateY(-2px);
+          }
+       }
+       @media (max-width: 767px) { /* Dark mobile active/focus-like effect */
+          .dark-mode .nav-link:active { /* Use active for touch feedback */
+             background-color: #374151; color: #fb7185;
+              transform: scale(0.98); /* Subtle press effect */
+              box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+          }
+       }
+      /* Dark Mode Profile Photo */
+       .dark-mode .profile-photo-column .profile-img-inline { border-color: #fda4af; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.25); }
+       /* Hover handled by specific media query above */
+      /* Dark Mode Blog Content */
+      .dark-mode .blog-content { color: #d1d5db; }
+      .dark-mode .blog-content h1 { color: #f9fafb; border-color: #4b5563; }
+      .dark-mode .blog-content h2 { color: #f3f4f6; border-color: #374151; }
+      .dark-mode .blog-content h3 { color: #f3f4f6; } .dark-mode .blog-content h4 { color: #e5e7eb; }
+      .dark-mode .blog-content a { color: #fda4af; text-decoration-color: #fb7185; }
+      .dark-mode .blog-content a:hover { color: #fecdd3; text-decoration-color: #fda4af; }
+      .dark-mode .blog-content blockquote { background-color: #1f2937; color: #9ca3af; border-color: #be123c; }
+      .dark-mode .blog-content code:not([class*="language-"]) { background-color: #374151; color: #e5e7eb; }
+      .dark-mode .blog-content pre[class*="language-"] { /* Okaidia is dark */ box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+      .dark-mode .blog-content img { border-color: #4b5563; filter: brightness(0.9) contrast(1.0); }
+      .dark-mode .blog-content figcaption { color: #9ca3af; }
+      .dark-mode .blog-content mark { background-color: #a3e635; color: #1f2937; }
+      .dark-mode .blog-content table, .dark-mode .blog-content th, .dark-mode .blog-content td { border-color: #4b5563; }
+      .dark-mode .blog-content th { background-color: #1f2937; color: #f3f4f6; }
+      .dark-mode .blog-content iframe { border-color: #4b5563; }
+      /* Dark Mode Blog List */
+      .dark-mode #blog-list > div.group { border-color: #374151; }
+      .dark-mode #blog-list > div.group:hover { background-color: #1f2937; }
+      .dark-mode #blog-list > div.group h3 { color: #f3f4f6; }
+      .dark-mode #blog-list > div.group:hover h3 { color: #fda4af; }
+      .dark-mode #blog-list > div.group p { color: #9ca3af; }
+      .dark-mode .back-to-list-button { color: #fda4af; }
+      .dark-mode .back-to-list-button:hover { color: #fecdd3; }
+      /* Dark Mode Footer */
+      .dark-mode footer { color: #9ca3af; } /* Slightly brighter */
+      /* Dark Mode Theme Toggle Icons */
+      .dark-mode #theme-toggle .fa-sun { display: none; }
+      .dark-mode #theme-toggle .fa-moon { display: block; }
+      #theme-toggle .fa-sun { display: block; }
+      #theme-toggle .fa-moon { display: none; }
+      /* Ensure all theme toggles behave */
+       .dark-mode .theme-toggle-button i.fa-sun { display: none; }
+       .dark-mode .theme-toggle-button i.fa-moon { display: inline-block; /* Use inline-block if inside button */ }
+       .theme-toggle-button i.fa-sun { display: inline-block; }
+       .theme-toggle-button i.fa-moon { display: none; }
+
+
+      /* =================================================== */
+      /* =================================================== */
+      /* === PHENOMENAL RESPONSIVE (< 768px) ================ */
+      /* =================================================== */
+      /* =================================================== */
+
+      @media (max-width: 767px) {
+
+        /* --- General Layout & Spacing --- */
+        body { /* Base cursor handled above */ }
+        main.container {
+             padding-top: clamp(2.5rem, 8vw, 4rem); /* Fluid top padding */
+             padding-bottom: clamp(4rem, 10vw, 6rem); /* Fluid bottom padding */
+             padding-left: 1rem; /* Slightly smaller fixed padding */
+             padding-right: 1rem;
+        }
+
+        /* --- Disable Desktop Effects --- */
+        #magic-cursor,
+        #blobCanvas {
+            display: none !important;
+        }
+
+        /* --- Header Responsive --- */
+        header {
+             margin-bottom: clamp(3rem, 10vw, 4rem) !important;
+             flex-direction: column !important;
+             align-items: center !important;
+             gap: 0.85rem; /* Consistent gap */
+         }
+         /* Ensure header in other sections behaves similarly */
+        #blog-section header, #projects-section header, #about-section header {
+             margin-bottom: clamp(3rem, 10vw, 4rem) !important;
+             flex-direction: column !important;
+             align-items: center !important;
+             gap: 0.85rem;
+        }
+        header .site-title { /* Already fluid via clamp() */ text-align: center; }
+        header nav { display: none !important; } /* Ensure hidden */
+         header .theme-toggle-button { transform: scale(0.95); } /* Slightly smaller toggle */
+
+         /* --- Home Section Responsive --- */
+        #home-section > .flex {
+             flex-direction: column !important;
+             align-items: center !important;
+             gap: clamp(1.5rem, 6vw, 2.5rem) !important; /* Fluid gap */
+        }
+
+        /* --- Phenomenal Photo Animation --- */
+         .profile-photo-column {
+              /* Reset desktop transforms */
+              transform: none !important;
+              width: clamp(100px, 30vw, 160px); /* Fluid width */
+              margin-bottom: -1rem; /* Slight overlap initiation */
+              /* Center alignment achieved by parent */
+          }
+         .profile-photo-column .profile-img-inline {
+             /* Inherits transitions */
+              width: 100%; /* Fill the fluid container */
+              height: auto; /* Maintain aspect ratio */
+              aspect-ratio: 1 / 1; /* Ensure circle */
+              border-width: 3px;
+              /* Remove desktop hover scale, mobile handled below */
+              transform: scale(1) !important;
+               box-shadow: 0 4px 10px rgba(31, 41, 55, 0.1), 0 1px 2px rgba(31, 41, 55, 0.08); /* Consistent shadow */
+           }
+           /* Active state for touch feedback */
+          .profile-photo-column .profile-img-inline:active {
+               transform: scale(0.97) !important; /* Press effect */
+               box-shadow: 0 2px 5px rgba(31, 41, 55, 0.15);
+          }
+          .dark-mode .profile-photo-column .profile-img-inline {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.2);
+          }
+          .dark-mode .profile-photo-column .profile-img-inline:active {
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+           }
+
+         /* --- Fluid Button Grid --- */
+          .button-links-grid {
+               grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)) !important; /* MAGIC! */
+               gap: clamp(0.5rem, 2vw, 0.75rem); /* Fluid gap */
+               width: 100%;
+               max-width: 420px; /* Limit width for sanity */
+               justify-items: stretch; /* Stretch buttons to fill grid cell */
+               padding-top: 1rem; /* Add padding due to photo overlap */
+               margin: 0 auto; /* Center grid container */
+          }
+          .nav-link {
+               padding: 0.7rem 0.5rem;
+               margin: 0.1rem; /* Minimal margin, rely on grid gap */
+               font-size: clamp(0.8rem, 2.5vw, 0.9rem); /* Fluid font size */
+               min-height: 44px; /* Ensure tappable height */
+               /* Remove desktop hover effects */
+               transform: none !important;
+               box-shadow: 0 1px 3px rgba(190, 18, 60, 0.08); /* Subtle base shadow */
+          }
+         /* Mobile Active state for Nav Links */
+         .nav-link:active {
+             transform: scale(0.97) !important; /* Press down effect */
+             box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+         }
+          .nav-link i {
+               margin-right: 0.4em;
+               width: 1.1em;
+          }
+          .dark-mode .nav-link { /* Active state defined above in Dark Mode section */ }
+
+
+        /* --- Blog & Other Section Adjustments --- */
+        .blog-content {
+            max-width: 100%;
+            padding-left: clamp(0.5rem, 3vw, 1rem); /* Fluid side padding */
+            padding-right: clamp(0.5rem, 3vw, 1rem);
+        }
+         /* Code block font size */
+         .blog-content pre code[class*="language-"] {
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+        }
+         .blog-content img {
+             border-radius: 0.375rem;
+         }
+        /* Center list/section headings */
+        #blog-list h2, #projects-section h2, #about-section h2 {
+             text-align: center;
+         }
+         /* Adjust Blog List Item Spacing */
+          #blog-list {
+              padding-left: 0.5rem;
+              padding-right: 0.5rem;
+          }
+         #blog-list > div.group {
+              padding: clamp(0.5rem, 2vw, 0.75rem); /* Fluid padding */
+         }
+
+        /* --- Footer Responsive --- */
+        footer {
+            padding-top: 1rem;
+            padding-bottom: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+    } /* End @media (max-width: 767px) */
+
+
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Desktop Effects Elements (Hidden on mobile by CSS) -->
+    <div id="magic-cursor"></div>
+    <canvas id="blobCanvas"></canvas>
+
+    <!-- Main Content Area: Uses responsive padding from Tailwind & CSS -->
+    <main class="flex-grow container mx-auto px-4 py-12 md:py-20 flex flex-col items-center justify-center">
+
+        <!-- ===== HOME SECTION ===== -->
+        <!-- Center content by default, alignment within handles desktop/mobile -->
+        <div id="home-section" class="page-section text-center w-full">
+             <!-- Header: Stacks/animates on mobile via CSS -->
+            <header class="w-full mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="site-title text-gray-900 mb-4 md:mb-0 cursor-pointer" onclick="showSection('home-section')">
+                    ~ / adrish
+                </h1>
+                <div class="flex items-center space-x-4">
+                    <nav class="hidden md:block">
+                        <a href="#" onclick="loadBlogList(); showSection('blog-section', true); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Blog</a>
+                        <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Projects</a>
+                        <a href="https://students.iiserkol.ac.in/~ag22ms048/" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
+                    </nav>
+                    <button id="theme-toggle-home" aria-label="Toggle Dark/Light Theme" type="button" class="theme-toggle-button p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-500">
+                       <i class="fa-solid fa-sun text-lg"></i>
+                       <i class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Container for Photo & Buttons: Fluid animation/layout via CSS -->
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-12 lg:gap-16 px-4 w-full">
+
+                <!-- Column 1: Profile Photo (Fluid size/position via CSS) -->
+                <!-- Desktop transforms applied via Tailwind md: prefixes removed -->
+                <div class="profile-photo-column"> <!-- CSS handles width/transform -->
+                   <img src="./images/prof.png"
+                        alt="Adrish - Profile Photo"
+                        class="profile-img-inline w-32 h-32 md:w-40 md:h-40 object-cover mx-auto block">
+                        <!-- Base sizes here are fallbacks/desktop, CSS overrides for mobile -->
+                </div>
+
+                <!-- Column 2: Button Links Grid (Fluid columns/gap via CSS) -->
+                 <div class="button-links-grid grid grid-cols-3 gap-4 justify-items-center md:justify-items-start"> <!-- Base columns/gap for desktop/SSR, CSS overrides for mobile -->
+                     <a href="#" onclick="loadBlogList(); showSection('blog-section', true); return false;" class="nav-link"> <i class="fa-solid fa-file-lines"></i>Blog </a>
+                     <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="nav-link"> <i class="fa-solid fa-gear"></i>Projects </a>
+                     <a href="https://students.iiserkol.ac.in/~ag22ms048/" class="nav-link"> <i class="fa-solid fa-user"></i>About </a>
+                     <a href="https://x.com/theadrish" target="_blank" rel="noopener noreferrer" class="nav-link" title="Twitter Profile"><i class="fa-brands fa-twitter"></i>Twitter</a>
+                     <a href="#" onclick="alert('Games link not set up yet!'); return false;" class="nav-link" title="Games Section"><i class="fa-solid fa-gamepad"></i>Games</a>
+                     <a href="https://github.com/Adrish-web" target="_blank" rel="noopener noreferrer" class="nav-link" title="GitHub Profile"><i class="fa-brands fa-github"></i>Github</a>
+                     <a href="https://www.linkedin.com/in/a-drish-ghosh/" target="_blank" rel="noopener noreferrer" class="nav-link" title="LinkedIn Profile"><i class="fa-brands fa-linkedin"></i>LinkedIn</a>
+                     <a href="https://www.youtube.com/channel/YOUR_CHANNEL_ID" target="_blank" rel="noopener noreferrer" class="nav-link" title="YouTube Channel"><i class="fa-brands fa-youtube"></i>Youtube</a>
+                     <a href="mailto:ag22ms048@iiserkol.ac.in" class="nav-link" title="Send Email"><i class="fa-solid fa-envelope"></i>Email</a>
+                </div>
+
+             </div> <!-- End Main Flex Container -->
+
+        </div> <!-- End Home Section -->
+
+
+        <!-- ===== BLOG SECTION ===== -->
+        <div id="blog-section" class="page-section hidden-section w-full">
+            <!-- Header (Fluid/Responsive via CSS) -->
+             <header class="w-full mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="site-title text-gray-900 mb-4 md:mb-0 cursor-pointer" onclick="showSection('home-section')">
+                     ~ / adrish
+                 </h1>
+                 <div class="flex items-center space-x-4">
+                     <nav class="hidden md:block">
+                         <a href="#" onclick="loadBlogList(); showSection('blog-section', true); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Blog</a>
+                         <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Projects</a>
+                         <a href="https://students.iiserkol.ac.in/~ag22ms048/" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
+                     </nav>
+                     <button id="theme-toggle-blog" aria-label="Toggle Dark/Light Theme" type="button" class="theme-toggle-button p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-500">
+                        <i class="fa-solid fa-sun text-lg"></i>
+                        <i class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                 </div>
+             </header>
+
+            <!-- Blog List Container -->
+            <div id="blog-list" class="w-full max-w-3xl mx-auto text-left mb-10">
+                <h2 class="text-gray-800">Latest Posts</h2> <!-- Styling via CSS -->
+                <p id="blog-loading-message" class="text-gray-500 text-center py-10">Loading posts...</p>
+                <!-- Dynamic post list -->
+            </div>
+            <!-- Single Blog Post Content Area -->
+            <div id="blog-post-content" class="hidden w-full">
+                 <!-- Fluid padding/max-width via CSS -->
+                <div class="blog-content mx-auto">
+                    <!-- Back button prepended by JS -->
+                    <!-- Markdown content rendered here -->
+                </div>
+                 <div id="post-script-runner" style="display: none;"></div>
+            </div>
+        </div><!-- End Blog Section -->
+
+
+         <!-- ===== PROJECTS SECTION (Stub) ===== -->
+        <div id="projects-section" class="page-section hidden-section w-full text-center">
+              <!-- Header (Fluid/Responsive via CSS) -->
+             <header class="w-full mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-center">
+                 <h1 class="site-title text-gray-900 mb-4 md:mb-0 cursor-pointer" onclick="showSection('home-section')">~ / adrish</h1>
+                 <div class="flex items-center space-x-4">
+                    <nav class="hidden md:block"> <!-- Nav links repeated for consistency -->
+                        <a href="#" onclick="loadBlogList(); showSection('blog-section', true); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Blog</a>
+                        <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 font-semibold text-rose-600 dark:text-rose-300">Projects</a> <!-- Example Active State -->
+                         <a href="https://students.iiserkol.ac.in/~ag22ms048/" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
+                    </nav>
+                    <button id="theme-toggle-projects" aria-label="Toggle Dark/Light Theme" type="button" class="theme-toggle-button p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-500">
+                       <i class="fa-solid fa-sun text-lg"></i>
+                       <i class="fa-solid fa-moon text-lg"></i>
+                   </button>
+                </div>
+             </header>
+             <!-- Fluid heading via clamp() -->
+             <h2 class="text-gray-800">Projects</h2> <!-- Styling via CSS -->
+             <p class="text-gray-600 dark:text-gray-400 px-4">Project details coming soon!</p>
+             <button onclick="showSection('home-section')" class="mt-10 px-6 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition duration-200 ease-in-out transform hover:-translate-y-0.5 shadow-md hover:shadow-lg">Back to Home</button>
+        </div>
+
+         <!-- ===== ABOUT SECTION (Stub) ===== -->
+         <div id="about-section" class="page-section hidden-section w-full text-center">
+               <!-- Header (Fluid/Responsive via CSS) -->
+              <header class="w-full mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-center">
+                  <h1 class="site-title text-gray-900 mb-4 md:mb-0 cursor-pointer" onclick="showSection('home-section')">~ / adrish</h1>
+                   <div class="flex items-center space-x-4">
+                      <nav class="hidden md:block"> <!-- Nav links repeated -->
+                          <a href="#" onclick="loadBlogList(); showSection('blog-section', true); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Blog</a>
+                          <a href="#" onclick="alert('Projects page not implemented yet!'); return false;" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Projects</a>
+                           <a href="https://students.iiserkol.ac.in/~ag22ms048/" class="nav-top-link text-gray-600 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 font-semibold text-rose-600 dark:text-rose-300">About</a> <!-- Example Active State -->
+                      </nav>
+                      <button id="theme-toggle-about" aria-label="Toggle Dark/Light Theme" type="button" class="theme-toggle-button p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-500">
+                         <i class="fa-solid fa-sun text-lg"></i>
+                         <i class="fa-solid fa-moon text-lg"></i>
+                     </button>
+                  </div>
+              </header>
+              <!-- Fluid heading via clamp() -->
+             <h2 class="text-gray-800">About Me</h2> <!-- Styling via CSS -->
+             <p class="text-gray-600 dark:text-gray-400 px-4">More about Adrish coming soon!</p>
+             <button onclick="showSection('home-section')" class="mt-10 px-6 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition duration-200 ease-in-out transform hover:-translate-y-0.5 shadow-md hover:shadow-lg">Back to Home</button>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-6 text-sm mt-auto text-gray-500 dark:text-gray-400"> <!-- Styling via CSS -->
+        Copyright © <span id="copyright-year"></span> by Adrish.
+    </footer>
+
+
+    <!-- ================================= -->
+    <!-- ========= MAIN JAVASCRIPT ======== -->
+    <!-- ================================= -->
+    <script>
+        // --- DOM References ---
+        let magicCursor, canvas, ctx, blogListContainer, blogPostContentContainer, blogLoadingMessage, postScriptRunner, copyrightYear, themeToggleButtons;
+
+        // --- Global State ---
+        let width, height, currentTheme = 'light', currentActiveSection = 'home-section';
+        let blobs = [], coords = { x: -100, y: -100 };
+        let lastMouseX = -100, lastMouseY = -100, mouseVelocityX = 0, mouseVelocityY = 0;
+        let isDesktopView = window.matchMedia('(min-width: 768px)').matches; // Initial check
+        const POSTS_JSON_URL = './posts.json';
+        const POSTS_DIR = './posts/';
+
+        // --- Blob Particle Class (Keep as is) ---
+        class Blob { /* ... Same Blob class code ... */
+             constructor(x, y, velocityX, velocityY) { this.x = x; this.y = y; this.hue = 200 + Math.random() * 20; this.saturation = 30 + Math.random() * 20; this.lightness = 70 + Math.random() * 10; this.finalSize = 1.5 + Math.random() * 2; this.size = this.finalSize * 1.5; this.initialAlpha = 0.3 + Math.random() * 0.2; this.alpha = this.initialAlpha; this.velocityX = velocityX * 0.03 + (Math.random() - 0.5) * 0.3; this.velocityY = 0.5 + Math.random() * 0.3 + velocityY * 0.03; this.gravity = 0.015; this.drag = 0.975; this.turbulence = () => Math.random() * 0.2 - 0.1; this.life = 0; this.maxLife = 50 + Math.random() * 20; }
+            draw() { ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+            update() { this.life++; const lifeRatio = Math.min(1, this.life / this.maxLife); this.x += this.velocityX + this.turbulence(); this.velocityX *= this.drag; this.y += this.velocityY; this.velocityY += this.gravity; this.size = this.finalSize + (this.finalSize * 0.5 * (1 - lifeRatio * lifeRatio)); this.alpha = this.initialAlpha * (1 - lifeRatio); this.alpha = Math.max(0, this.alpha); }
+        }
+
+        // --- Event Handlers ---
+        function handleMouseMove(e) {
+            coords.x = e.clientX; coords.y = e.clientY; // Always update coords for potential cursor
+            if (isDesktopView && blobs) { // Only generate blobs on desktop
+                 mouseVelocityX = e.clientX - lastMouseX; mouseVelocityY = e.clientY - lastMouseY;
+                 lastMouseX = e.clientX; lastMouseY = e.clientY;
+                 const velocityMagnitude = Math.sqrt(mouseVelocityX**2 + mouseVelocityY**2);
+                 const blobsToCreate = Math.min(2, Math.ceil(velocityMagnitude / 20));
+                 for (let i = 0; i < blobsToCreate; i++) { const spawnX = e.clientX + (Math.random() - 0.5) * 10; const spawnY = e.clientY + (Math.random() - 0.5) * 10; if (blobs.length < 100) { blobs.push(new Blob(spawnX, spawnY, mouseVelocityX, mouseVelocityY)); } }
+                 if (velocityMagnitude < 3 && Math.random() < 0.03 && blobs.length < 100) { blobs.push(new Blob(e.clientX, e.clientY, 0, 0)); }
+            }
+        }
+
+        function handleResize() {
+             isDesktopView = window.matchMedia('(min-width: 768px)').matches; // Update view state
+             if (canvas && ctx) { // Resize canvas if exists
+                 width = canvas.width = window.innerWidth;
+                 height = canvas.height = window.innerHeight;
+             }
+             // Toggle animations based on view? Not strictly needed if CSS handles display:none
+             toggleDesktopAnimations(isDesktopView);
+        }
+
+        function toggleDesktopAnimations(enable) {
+            // Instead of hiding here, CSS @media query handles display: none
+            // We just need to ensure animation loops don't run wastefully
+            console.log("Desktop view:", enable);
+             // If needed, stop/start requestAnimationFrame loops here,
+             // but checking `isDesktopView` within the loop is usually sufficient.
+        }
+
+        // --- Animation Loops ---
+        function animateCursor() {
+            if (magicCursor && isDesktopView) { // Only run if cursor element exists & is desktop
+                 magicCursor.style.transform = `translate(${coords.x}px, ${coords.y}px) translate(-50%, -50%)`;
+            }
+            requestAnimationFrame(animateCursor);
+        }
+
+        function animateBlobs() {
+             if (canvas && ctx && isDesktopView && blobs) { // Only run if canvas/ctx exist, is desktop & blobs array exists
+                 ctx.clearRect(0, 0, width, height);
+                 for (let i = blobs.length - 1; i >= 0; i--) { /* ... Blob update/draw logic ... */
+                    const blob = blobs[i]; blob.update(); blob.draw();
+                    if (blob.alpha <= 0 || blob.life >= blob.maxLife || blob.y > height + blob.size || blob.x < -blob.size || blob.x > width + blob.size) { blobs.splice(i, 1); }
+                 }
+             } else if (canvas && ctx && blobs && blobs.length > 0 && !isDesktopView) {
+                  // Optionally clear blobs instantly when switching to mobile
+                 // blobs = []; // Uncomment to clear particles on resize to mobile
+                 // ctx.clearRect(0, 0, width, height);
+             }
+             requestAnimationFrame(animateBlobs);
+        }
+
+
+        // --- Blog Loading Logic (Mostly Unchanged) ---
+        async function loadBlogList() { console.log("Loading blog list..."); if (!blogLoadingMessage || !blogListContainer) return; showLoadingState(true); showBlogPostView(false); try { const response = await fetch(POSTS_JSON_URL); if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`); const posts = await response.json(); posts.sort((a, b) => new Date(b.date) - new Date(a.date)); displayBlogList(posts); } catch (error) { console.error("Error loading blog list:", error); displayBlogError(`Could not load blog index: ${error.message}`); } finally { showLoadingState(false); } }
+        function showLoadingState(isLoading) { /* ... Same as before ... */ if (!blogLoadingMessage || !blogListContainer) return; if (isLoading) { blogLoadingMessage.textContent = 'Loading posts...'; blogLoadingMessage.style.display = 'block'; blogListContainer.querySelectorAll(':scope > div.group, :scope > p').forEach(el => el.remove()); } else { blogLoadingMessage.style.display = 'none'; } }
+        function displayBlogError(message) { /* ... Same as before ... */ if (!blogLoadingMessage || !blogListContainer) return; blogLoadingMessage.style.display = 'none'; blogListContainer.querySelectorAll(':scope > div.group, :scope > p').forEach(el => el.remove()); const errorElement = document.createElement('p'); errorElement.className = 'text-red-600 dark:text-red-400 text-center py-10'; errorElement.textContent = message; blogListContainer.appendChild(errorElement); }
+        function displayBlogList(posts) { /* ... Same list creation logic ... */ if (!blogListContainer) return; blogListContainer.querySelectorAll(':scope > div.group, :scope > p').forEach(el => el.remove()); if (!posts || posts.length === 0) { const noPostsElement = document.createElement('p'); noPostsElement.className = 'text-gray-600 dark:text-gray-400 text-center py-10'; noPostsElement.textContent = 'No blog posts published yet!'; blogListContainer.appendChild(noPostsElement); return; } posts.forEach(post => { const postClickDiv = document.createElement('div'); /* ... set attributes, onclick ... */ postClickDiv.setAttribute('role', 'link'); postClickDiv.setAttribute('tabindex', '0'); postClickDiv.onclick = () => loadAndShowPost(post.file); postClickDiv.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') loadAndShowPost(post.file); }; const dateString = new Date(post.date + 'T00:00:00Z').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }); postClickDiv.innerHTML = `<h3 class="group-hover:text-rose-700 dark:group-hover:text-rose-300 pointer-events-none">${post.title}</h3><p class="text-sm text-gray-500 dark:text-gray-400 mb-2 pointer-events-none">${dateString}</p><p class="text-base text-gray-600 dark:text-gray-400 pointer-events-none">${post.snippet || ''}</p>`; const groupDiv = document.createElement('div'); groupDiv.className = 'group'; /* Style from CSS */ groupDiv.appendChild(postClickDiv); blogListContainer.appendChild(groupDiv); }); }
+        async function loadAndShowPost(markdownFile) { console.log(`Loading post: ${markdownFile}`); if (!blogPostContentContainer || !postScriptRunner) return; showBlogPostView(true); const contentDiv = blogPostContentContainer.querySelector('.blog-content'); contentDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-10">Loading post...</p>'; postScriptRunner.innerHTML = ''; try { const postPath = `${POSTS_DIR}${markdownFile}`; const response = await fetch(postPath); if (!response.ok) throw new Error(`Could not fetch ${postPath}. Status: ${response.status}`); const markdownText = await response.text(); marked.setOptions({ breaks: true, gfm: true, pedantic: false, mangle: false, headerIds: true }); const postHtml = marked.parse(markdownText); /* HTML/Script processing same as before */ const tempDiv = document.createElement('div'); tempDiv.innerHTML = postHtml; /* Apply table/iframe wrappers needed */ tempDiv.querySelectorAll('iframe[src*="youtube.com"], iframe[src*="vimeo.com"]').forEach(ifr => { const wr = document.createElement('div'); wr.className = 'aspect-video'; ifr.parentNode.insertBefore(wr, ifr); wr.appendChild(ifr); }); contentDiv.innerHTML = tempDiv.innerHTML; Prism.highlightAllUnder(contentDiv); /* Script runner logic */ const postScripts = Array.from(contentDiv.querySelectorAll('script')); postScripts.forEach(s => { const nS = document.createElement('script'); for (let i = 0; i < s.attributes.length; i++) { nS.setAttribute(s.attributes[i].name, s.attributes[i].value); } if (s.textContent) try { nS.appendChild(document.createTextNode(s.textContent)); } catch (e) { console.error("Err setting script text:", e)} s.parentNode.removeChild(s); postScriptRunner.appendChild(nS); }); if (typeof renderMyChart1 === 'function' && contentDiv.querySelector('#myChart1')) try { renderMyChart1(); } catch(e) { console.error("Err calling renderMyChart1:", e); } } catch (error) { console.error(`Error loading/parsing ${markdownFile}:`, error); contentDiv.innerHTML = `<div class="text-center py-10"><p class="text-red-600 font-semibold">Sorry, couldn't load this post.</p><p class="text-sm text-gray-500 mt-2">${error.message}</p></div>`; } }
+        function showBlogPostView(showPost) { /* ... Add Back button, toggle visibility, scroll ... */ if (!blogListContainer || !blogPostContentContainer || !postScriptRunner) return; let backButton = blogPostContentContainer.querySelector('.back-to-list-button'); if (!backButton && showPost) { backButton = document.createElement('button'); backButton.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Back to Blog List'; backButton.className = 'back-to-list-button'; /* Styles from CSS */ backButton.onclick = () => { showSection('blog-section'); }; blogPostContentContainer.insertBefore(backButton, blogPostContentContainer.firstChild); } if (showPost) { blogListContainer.classList.add('hidden'); blogPostContentContainer.classList.remove('hidden'); if (window.scrollY > 150) window.scrollTo({ top: 0, behavior: 'smooth' }); } else { blogListContainer.classList.remove('hidden'); blogPostContentContainer.classList.add('hidden'); postScriptRunner.innerHTML = ''; } }
+
+        // --- Page Section Navigation (Keep as is, Tailwind handles nav link styling) ---
+        function showSection(sectionIdToShow, isTriggeredByLink = false) { /* ... Same logic for hiding/showing sections ... */ console.log(`showSection: ${sectionIdToShow}`); currentActiveSection = sectionIdToShow; const sections = document.querySelectorAll('.page-section'); sections.forEach(section => { if (section.id !== sectionIdToShow) { section.style.opacity = 0; setTimeout(() => { if (section.id !== currentActiveSection) section.classList.add('hidden-section', 'hidden'); }, 500); } }); const sectionToShow = document.getElementById(sectionIdToShow); if (sectionToShow) { sectionToShow.classList.remove('hidden-section', 'hidden'); sectionToShow.style.height = ''; sectionToShow.style.overflow = ''; sectionToShow.style.position = ''; if (sectionIdToShow === 'blog-section') { console.log("Blog section: ensuring list view."); showBlogPostView(false); const listHasContent = blogListContainer && blogListContainer.querySelector(':scope > div.group'); const isLoading = blogLoadingMessage && blogLoadingMessage.style.display === 'block'; const firstContentElement = blogListContainer && blogListContainer.querySelector(':scope > h2 + *'); const listSeemsEmpty = !firstContentElement || !firstContentElement.classList.contains('group'); if (listSeemsEmpty && !isLoading) { console.log("List seems empty, loading."); loadBlogList(); } } requestAnimationFrame(() => { requestAnimationFrame(() => { sectionToShow.style.opacity = 1; }); }); } else { console.warn(`Section "${sectionIdToShow}" not found.`); } /* Nav link active state now purely CSS/Tailwind based on the example structure */ }
+
+        // --- Dark/Light Theme Toggle Logic (Unchanged) ---
+        function applyTheme(theme) { console.log("Applying theme:", theme); currentTheme = theme; const isDark = theme === 'dark'; document.documentElement.classList.toggle('dark-mode', isDark); document.body.classList.toggle('dark-mode', isDark); localStorage.setItem('theme', theme); }
+        function setupTheme() { const userTheme = localStorage.getItem('theme'); const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; if (userTheme === 'dark' || (!userTheme && systemPrefersDark)) { applyTheme('dark'); } else { applyTheme('light'); } console.log(`Initial theme set to: ${currentTheme}`); themeToggleButtons = document.querySelectorAll('.theme-toggle-button'); if (themeToggleButtons.length > 0) { themeToggleButtons.forEach(btn => { btn.addEventListener('click', () => { applyTheme(currentTheme === 'light' ? 'dark' : 'light'); }); }); } else { console.error("Theme toggle button(s) not found!"); } window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } }); }
+
+
+        // --- Initialization Function ---
+        function initialize() {
+            // Assign DOM references
+             magicCursor = document.getElementById('magic-cursor');
+             canvas = document.getElementById('blobCanvas');
+             blogListContainer = document.getElementById('blog-list');
+             blogPostContentContainer = document.getElementById('blog-post-content');
+             blogLoadingMessage = document.getElementById('blog-loading-message');
+             postScriptRunner = document.getElementById('post-script-runner');
+             copyrightYear = document.getElementById('copyright-year');
+
+             // Try getting canvas context only if canvas exists
+             if (canvas) try { ctx = canvas.getContext('2d'); } catch (e) { ctx = null; console.error("Canvas context failed", e); }
+             else ctx = null;
+
+             if(copyrightYear) copyrightYear.textContent = new Date().getFullYear();
+
+             setupTheme(); // Check/apply theme, set up listeners
+             handleResize(); // Set initial isDesktopView, size canvas
+
+             // Start animations (loops internally check if they should run)
+             animateCursor();
+             animateBlobs();
+
+             showSection('home-section'); // Show initial section
+
+             // Add global event listeners
+             window.addEventListener('mousemove', handleMouseMove);
+             window.addEventListener('resize', handleResize);
+
+             console.log("Initialization complete. Desktop view:", isDesktopView);
+         }
+
+        // --- DOM Ready ---
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        // --- Helper Functions (Keep Chart Render) ---
+        function renderMyChart1() { /* ... Your Chart.js rendering code ... */ }
+
+    </script>
+
+</body>
+</html>
