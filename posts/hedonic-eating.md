@@ -11,6 +11,8 @@ Deep in the brain’s reward center, the **ventral tegmental area (VTA) dopamine
 - **Closed-loop optogenetics** revealed that activating VTA<sup>DA</sup> neurons _only during eating_ prolongs consumption, mimicking the effect of ultra-palatable foods. Conversely, silencing them cuts meals short, even if the food is delicious :cite[2]:cite[4].
 - **Hunger vs. Sickness**: Hunger amplifies their activity, while nausea (e.g., from illness or toxins like lithium chloride) mutes it. This explains why we crave fries when hungry but lose appetite when sick :cite[1].
 
+![VTA](./images/hedonic.jpg)
+
 ---
 
 ## 🔄 **Act 2: The Brain’s Hidden Circuit**
