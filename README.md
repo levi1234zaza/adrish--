@@ -27,13 +27,14 @@ _(Replace placeholders after publishing)_
 
 ## Project Structure
 
-Use code with caution.
-Markdown
-├── images
-│ └── prof.png
-├── index.html # Main HTML entry point
-├── posts
-│ └── example.md # Blog posts in Markdown format
-├── posts.json # Index file for blog posts
-├── vid.html # (Assuming this is another page/utility)
-└── README.md # This file
+```plaintext
+.
+├── images/
+│   └── prof.png         # Profile picture and other static image assets
+├── posts/
+│   └── neanderthal-genetics-interbreeding.md  # Blog posts written in Markdown format
+├── index.html           # Main landing page / portfolio entry point
+├── posts.json           # JSON index of blog posts (title, date, file, snippet)
+├── vid.html             # Auxiliary HTML page (purpose TBD, e.g., video, experiment)
+└── README.md            # This file: project info, setup, etc.
+```
