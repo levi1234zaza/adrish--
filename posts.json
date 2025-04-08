@@ -1,8 +1,15 @@
 [
   {
     "title": "Beyond Bones: How Encounters with Neanderthals Rewrote Our Genetic Destiny",
-    "date": "2025-04-07", 
+    "date": "2025-04-07",
     "file": "neanderthal-genetics-interbreeding.md",
     "snippet": "Explore how interbreeding with Neanderthals left a lasting mark on our DNA, influencing everything from immunity to behavior. Insights into human evolution."
+  },
+  {
+    "title": "The Brain's Secret Snack Code: How Dopamine Neurons Hijack Your Cravings (And How Science Is Fighting Back)",
+    "date": "2025-03-28",
+    "file": "hedonic-eating-dopamine-neural-circuits.md",
+    "snippet": "Discover how dopamine neurons in the brain's reward system drive compulsive snacking, why weight-loss drugs like semaglutide sometimes fail, and what ancient survival instincts reveal about modern obesity. A deep dive into the neuroscience of pleasure-driven eating."
   }
 ]
+
