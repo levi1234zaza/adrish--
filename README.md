@@ -22,7 +22,7 @@ This repository contains the source code for my personal portfolio and blog webs
 
 ## Live Site
 
-You can view the live website here: [https://<Your GitHub Username>.github.io/<repository-name>/](https://<Your GitHub Username>.github.io/<repository-name>/)
+You can view the live website here: [https://adrish-web.github.io/adrish--/](https://adrish-web.github.io/adrish--/)
 _(Replace placeholders after publishing)_
 
 ## Project Structure
